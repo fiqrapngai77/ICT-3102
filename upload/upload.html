@@ -49,7 +49,7 @@
       <!-- Content here -->
 	  
 	  <!--Uploading gimmick is here, uploads files via forms, but need to find a server side way to handle uploading -->
-      <form action="/upload" class="dropzone" id="dropzoneTest"></form>
+      <form action="/file-upload" class="dropzone" id="dropzoneTest" encType="multipart/form-data" method='post'></form>
 
     </div>
 
@@ -89,11 +89,28 @@
 		addRemoveLinks: true,
 		renameFile: "Change_name_in_js",
 		//Remove below when server side is implemented
-		accept: function (file, done) {
-				done('Here you can write anything');
-				$('.dz-preview').last().toggleClass('dz-error dz-success');
-			}
-		};
+		// accept: function (file, done) {
+		// 		done('Here you can write anything');
+		// 		$('.dz-preview').last().toggleClass('dz-error dz-success');
+		// 	}
+    // };
+    headers: {
+    'x-csrf-token': document.querySelectorAll('meta[name=csrf-token]')[0].getAttributeNode('content').value,
+    },
+    acceptedFiles: 'image/*',
+    init: function() {
+      this.on('success', function( file, resp ){
+        console.log( file );
+        console.log( resp );
+      });
+      this.on('thumbnail', function(file) {
+          file.acceptDimensions();
+      });
+    },
+    accept: function(file, done) {
+      file.acceptDimensions = done;
+    }
+  };
 	</script>
     <script>$(document).ready(function() { $('body').bootstrapMaterialDesign(); });</script>
 	
