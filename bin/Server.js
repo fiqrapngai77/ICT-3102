@@ -12,7 +12,8 @@ var Storage = multer.diskStorage({
         callback(null, '/Users/jerahmeel/WebstormProjects/ICT3102NodeJS/img/');
     },
     filename: function (req, file, callback) {
-        callback(null, file.fieldname + '-' + Date.now());
+        // console.log(file);
+        callback(null, Date.now()+file.originalname );
         // callback(null, file.fieldname + '-' + Date.now());
     }
 });
@@ -37,31 +38,10 @@ http.createServer( function (request, response) {
                 console.log("The file was saved!");
                 response.end("File uploaded sucessfully!.");
             });
-            // form.parse(request, function (err, fields, files) {
-            //     console.log(files);
-            //     upload(request, response, function (err) {
-            //         if (err) {
-            //             console.log("Something went wrong!");
-            //             response.end("Something went wrong!");
-            //         }
-            //         console.log("The file was saved!");
-            //         response.end("File uploaded sucessfully!.");
-            //     });
-
-                // fs.writeFile("/Users/jerahmeel/WebstormProjects/ICT3102NodeJS/img/"+files.displayImage.name,
-                //     files.displayImage.file., function(err) {
-                //     if(err) {
-                //         return console.log(err);
-                //     }
-                //
-                //     console.log("The file was saved!");
-                //     response.write("success");
-                //     response.end();
-                // });
-            // });
         }
     }else {
         // Read the requested file content from file system
+        // console.log("The file: "+ pathname.substr(1));
         fs.readFile(pathname.substr(1), function (err, data) {
             if (err) {
                 console.log(err);
