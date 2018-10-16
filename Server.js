@@ -1,7 +1,7 @@
 var http = require('http');
 var fs = require('fs');
 var url = require('url');
-
+var morgan = require('morgan');
 var multer = require('multer');
 var express =   require("express");
 var formidable = require('formidable');
@@ -9,7 +9,7 @@ var app = express();
 
 app.use(express.static('public'));
 app.use('/upload', express.static('public'));
-
+app.use(morgan('combined'));
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
         callback(null, __dirname+"/public/imgdatabank");
@@ -55,7 +55,7 @@ http.createServer(function (req, res) {
 
     if(req.method === 'POST'){
         if (req.url === '/upload') {
-            let form = new formidable.IncomingForm();
+            // let form = new formidable.IncomingForm();
             upload(req, res, function (err) {
                 if (err) {
                     console.log("Something went wrong!");
