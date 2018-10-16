@@ -1,0 +1,35 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 24 Sep, 2018, 5:51:29 PM
+    Author     : fiqra
+*/
+
+.center{
+      margin: auto;
+      margin-top: 15px;
+      margin-bottom: 35px;
+      width: 400px;
+      box-shadow: -5px 5px 5px grey;
+      border-style: outset;
+      border-radius: 0.3em;
+    }
+
+    .image{
+      width: 395px;
+    }
+    
+    .profile{
+        width: 30px; 
+        height:30px; 
+        margin-top: 10px; 
+        margin-left: 10px; 
+        border-radius: 50%;
+    }
+    
+    .name{
+        margin-left: 10px; 
+    }
