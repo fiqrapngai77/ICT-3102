@@ -84,7 +84,7 @@
     var limit = 1;
     var timer;
     var windowHeight = $(window).height();
-    var triggerHeight = 0.1 * windowHeight;
+    var triggerHeight = 0.5 * windowHeight;
 
     $(document).ready(function(){
         $.ajax({
@@ -123,7 +123,7 @@
                     }
                 });
             }
-        }, 30);
+        }, 20);
         // if( $(window).scrollTop() >= $(document).height() - $(window).height()){
         //     $.ajax({
         //         type: "GET",
