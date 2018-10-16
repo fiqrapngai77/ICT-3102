@@ -82,10 +82,9 @@
 <script type="text/javascript">
     var flag = 0;
     var limit = 1;
-    var pause = false;
-    function unPause() {
-        pause = false;
-    }
+    var timer;
+    var windowHeight = $(window).height();
+    var triggerHeight = 0.1 * windowHeight;
 
     $(document).ready(function(){
         $.ajax({
@@ -97,27 +96,48 @@
             },
             success: function(data){
                 $('body').append(data);
-                // flag += limit;
                 flag += limit;
             }
         });
     });
 
     $(window).scroll(function(){
-        if(!pause && $(window).scrollTop() >= $(document).height() - $(window).height()){
-            $.ajax({
-                type: "GET",
-                url: "http://127.0.0.1:8081/loadmore.html",
-                data:{
-                    'offset': flag,
-                    'limit': limit
-                },
-                success: function(data){
-                    $('body').append(data);
-                    flag += limit;
-                }
-            });
+        if(timer) {
+            window.clearTimeout(timer);
         }
+        timer = window.setTimeout(function() {
+            // this variable changes between callbacks, so we can't cache it
+            var y = $(window).scrollTop() + windowHeight;
+
+            if(y > triggerHeight) {
+                $.ajax({
+                    type: "GET",
+                    url: "http://127.0.0.1:8081/loadmore.html",
+                    data:{
+                        'offset': flag,
+                        'limit': limit
+                    },
+                    success: function(data){
+                        $('body').append(data);
+                        flag += limit;
+                    }
+                });
+            }
+        }, 30);
+        // if( $(window).scrollTop() >= $(document).height() - $(window).height()){
+        //     $.ajax({
+        //         type: "GET",
+        //         url: "http://127.0.0.1:8081/loadmore.html",
+        //         data:{
+        //             'offset': flag,
+        //             'limit': limit
+        //         },
+        //         complete: function(data){
+        //             $('body').append(data);
+        //             flag += limit;
+        //         }
+        //     });
+        // }
     });
 </script>
 </body>
