@@ -9,7 +9,9 @@ var app = express();
 
 app.use(express.static('public'));
 app.use('/upload', express.static('public'));
-app.use(morgan('combined'));
+// app.use(morgan('common'));
+var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'});
+app.use(morgan('{"REMOTE_ADDR": ":REMOTE-ADDR", "REMOTE_USER": ":REMOTE-USER", "DATE": ":DATE[CLF]", "METHOD": ":METHOD", "URL": ":URL", "HTTP_VERSION": ":HTTP-VERSION", "STATUS": ":STATUS", "RESULT_LENGTH": ":RES[CONTENT-LENGTH]", "REFERRER": ":REFERRER", "USER_AGENT": ":USER-AGENT", "RESPONSE_TIME": ":RESPONSE-TIME"}', {stream: accessLogStream}));
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
         callback(null, __dirname+"/public/imgdatabank");
@@ -55,8 +57,6 @@ fs.readdir(__dirname+"/public/imgdatabank", (err, files) => {
     });
 });
 
-// console.log(imgdir);
-var currentI = 0;
 http.createServer(function (req, res) {
     // console.log('Time:', Date.now()+" "+`${req.method} ${req.url}`);
     // parse URL
@@ -106,23 +106,34 @@ http.createServer(function (req, res) {
             }
 
             if(q.offset != null) {
-                if(currentI >= imgdir.length){
-                    return;
-                }else{
-                    for (i = 0; i < 3; i++) {
-                        // console.log(q.offset+ " "+ currentI);
-                        console.log(imgdir[currentI]);
-                        res.write('<section class=\'center\'>');
-                        res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[currentI]+'</span></div>');
-                        res.write('<hr/>');
-                        res.write('<div> <img src=/imgdatabank/'+imgdir[currentI]+' class="image"></div>');
-                        res.write('<div><p>Comments</p>');
-                        res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
-                        res.write('</section>');
-                        currentI += 1;
-                    }
+                if(q.offset < imgdir.length){
+                    res.write('<section class=\'center\'>');
+                    res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[q.offset]+'</span></div>');
+                    res.write('<hr/>');
+                    res.write('<div> <img src=/imgdatabank/'+imgdir[q.offset]+' class="image"></div>');
+                    res.write('<div><p>Comments</p>');
+                    res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+                    res.write('</section>');
                 }
                 res.end();
+                // if(currentI >= imgdir.length){
+                //     return;
+                // }else{
+                //     for (i = 0; i < 3; i++) {
+                //         // console.log(q.offset+ " "+ currentI);
+                //         console.log(imgdir[currentI]);
+                //         res.write('<section class=\'center\'>');
+                //         res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[currentI]+'</span></div>');
+                //         res.write('<hr/>');
+                //         res.write('<div> <img src=/imgdatabank/'+imgdir[currentI]+' class="image"></div>');
+                //         res.write('<div><p>Comments</p>');
+                //         res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+                //         res.write('</section>');
+                //         currentI += 1;
+                //     }
+                // }
+                // res.end();
+
                 // if(q.offset >= imgdir.length){
                 //     // console.log(imgdir.length);
                 //     currentI = q.offset;
