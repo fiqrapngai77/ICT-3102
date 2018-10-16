@@ -1,3 +1,9 @@
+/**
+ * 
+ * @type Module http|Module http
+ * Author: JERAHMEEL
+ */
+
 var http = require('http');
 var fs = require('fs');
 var url = require('url');
