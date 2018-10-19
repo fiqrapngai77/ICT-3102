@@ -24,19 +24,15 @@
     <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
       <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
         <li class="nav-item active">
-          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="/index.html">Home <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="upload/index.html">Upload</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#" data-toggle="modal" data-target="#exampleModal">Disabled</a>
+        <li class="nav-item active">
+          <a class="nav-link" href="search.html">Search</a>
         </li>
       </ul>
-      <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-      </form>
     </div>
   </nav>
 
@@ -45,29 +41,6 @@
 
 <!-- TEST -->
 
-
-
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Jun Wei</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Correct right?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Nice...</button>
-        <button type="button" class="btn btn-primary">Agreed</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <!-- Optional JavaScript -->
@@ -79,6 +52,8 @@
 
 
 <script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="./js/typeahead.jquery.js"></script>
+
 <script type="text/javascript">
     var flag = 0;
     var limit = 1;
@@ -124,20 +99,6 @@
                 });
             }
         }, 20);
-        // if( $(window).scrollTop() >= $(document).height() - $(window).height()){
-        //     $.ajax({
-        //         type: "GET",
-        //         url: "http://127.0.0.1:8081/loadmore.html",
-        //         data:{
-        //             'offset': flag,
-        //             'limit': limit
-        //         },
-        //         complete: function(data){
-        //             $('body').append(data);
-        //             flag += limit;
-        //         }
-        //     });
-        // }
     });
 </script>
 </body>

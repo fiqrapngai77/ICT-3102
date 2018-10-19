@@ -5,6 +5,7 @@ var morgan = require('morgan');
 var multer = require('multer');
 var express =   require("express");
 var formidable = require('formidable');
+var qs = require('querystring');
 var app = express();
 
 app.use(express.static('public'));
@@ -58,7 +59,7 @@ fs.readdir(__dirname+"/public/imgdatabank", (err, files) => {
 });
 
 http.createServer(function (req, res) {
-    // console.log('Time:', Date.now()+" "+`${req.method} ${req.url}`);
+    console.log('Time:', Date.now()+" "+`${req.method} ${req.url}`);
     // parse URL
     const parsedUrl = url.parse(req.url);
     // Website you wish to allow to connect
@@ -89,6 +90,43 @@ http.createServer(function (req, res) {
                 res.end("File uploaded sucessfully!.");
             });
         }
+
+        if (req.url === '/search.html') {
+            // let form = new formidable.IncomingForm();
+            // se got to search for closest stuff in imgdir
+            console.log("SEARCH HERE ");
+            var body = '';
+            req.on('data', function (data) {
+                body += data;
+                // Too much POST data, kill the connection!
+                // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
+                if (body.length > 1e6)
+                    req.connection.destroy();
+            });
+
+            req.on('end', function () {
+                var post = qs.parse(body);
+                // use post['blah'], etc.
+                console.log(post.s);
+                var matches = [];
+                for (var j=0; j<imgdir.length; j++) {
+                    if (imgdir[j].indexOf(post.s) > -1) matches.push(imgdir[j]);
+                }
+                console.log(matches.length);
+                for (var k=0; k<matches.length; k++) {
+                    res.write('<section class=\'center\'>');
+                    res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+matches[k]+'</span></div>');
+                    res.write('<hr/>');
+                    res.write('<div> <img src=/imgdatabank/'+matches[k]+' class="image"></div>');
+                    res.write('<div><p>Comments</p>');
+                    res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+                    res.write('</section>');
+                }
+                res.end();
+            });
+
+            // return -1;
+        }
     }else{
         var q = url.parse(req.url, true).query;
         // var txt = q.offset + " " + q.limit;
@@ -105,6 +143,12 @@ http.createServer(function (req, res) {
                 pathname += '/index.html';
             }
 
+            if (req.url === '/search') {
+                //extract key using req.query.key
+                //call MySQL Query.
+                //form JSON response and return.
+                pathname += '/search.html';
+            }
             if(q.offset != null) {
                 if(q.offset < imgdir.length){
                     res.write('<section class=\'center\'>');
@@ -116,43 +160,6 @@ http.createServer(function (req, res) {
                     res.write('</section>');
                 }
                 res.end();
-                // if(currentI >= imgdir.length){
-                //     return;
-                // }else{
-                //     for (i = 0; i < 3; i++) {
-                //         // console.log(q.offset+ " "+ currentI);
-                //         console.log(imgdir[currentI]);
-                //         res.write('<section class=\'center\'>');
-                //         res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[currentI]+'</span></div>');
-                //         res.write('<hr/>');
-                //         res.write('<div> <img src=/imgdatabank/'+imgdir[currentI]+' class="image"></div>');
-                //         res.write('<div><p>Comments</p>');
-                //         res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
-                //         res.write('</section>');
-                //         currentI += 1;
-                //     }
-                // }
-                // res.end();
-
-                // if(q.offset >= imgdir.length){
-                //     // console.log(imgdir.length);
-                //     currentI = q.offset;
-                //     return;
-                // }
-                // res.writeHead(200, {'Content-Type': 'text/html'});
-                // for (i = currentI; i < q.offset; i++) {
-                //     console.log(q.offset+ " "+ i);
-                //     console.log(imgdir[i]);
-                //     res.write('<section class=\'center\'>');
-                //     res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[i]+'</span></div>');
-                //     res.write('<hr/>');
-                //     res.write('<div> <img src=/imgdatabank/'+imgdir[i]+' class="image"></div>');
-                //     res.write('<div><p>Comments</p>');
-                //     res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
-                //     res.write('</section>');
-                //     currentI = i;
-                // }
-                // res.end();
                 return;
             }
             // read file from file system
