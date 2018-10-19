@@ -31,14 +31,11 @@
           <li class="nav-item active">
             <a class="nav-link" href="/upload/index.html">Upload</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" href="#" data-toggle="modal" data-target="#exampleModal">Disabled</a>
+          <li class="nav-item active">
+            <a class="nav-link" href="../search.html">Search</a>
           </li>
+
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
       </div>
     </nav>
   </head>
@@ -49,31 +46,15 @@
       <!-- Content here -->
 	  
 	  <!--Uploading gimmick is here, uploads files via forms, but need to find a server side way to handle uploading -->
-      <form action="/upload" class="dropzone" id="dropzoneTest" name="displayImage" encType="multipart/form-data" method='post'></form>
-
-    </div>
-
-
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Jun Wei</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            Correct right?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Nice...</button>
-            <button type="button" class="btn btn-primary">Agreed</button>
-          </div>
+      <form action="/upload" class="dropzone" id="dropzoneTest" name="displayImage" encType="multipart/form-data" method='post'>
+        <!-- If you want control over the fallback form, just add it here: -->
+        <div class="fallback"> <!-- This div will be removed if the fallback is not necessary -->
+          <input type="file" name="youfilename" />
         </div>
-      </div>
+      </form>
+
     </div>
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
