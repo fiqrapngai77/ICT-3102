@@ -7,6 +7,21 @@ var express =   require("express");
 var formidable = require('formidable');
 var qs = require('querystring');
 var app = express();
+var mongoose = require("mongoose");
+const { parse } = require('querystring');
+
+ //sum mongoose schtick for connecting to local monogod
+mongoose.Promise = global.Promise;
+mongoose.connect("mongodb://localhost:27017/test",{ useNewUrlParser: true })
+	.catch(function (reason) { console.log('Unable to connect to the mongodb instance. Error: ', reason);
+});
+
+//mongoose schtick for scheme
+var accountSchema = new mongoose.Schema({
+ username: String,
+ passworde: String
+});
+var Account = mongoose.model("Account", accountSchema);
 
 app.use(express.static('public'));
 app.use('/upload', express.static('public'));
@@ -58,6 +73,7 @@ fs.readdir(__dirname+"/public/imgdatabank", (err, files) => {
     });
 });
 
+var fakeSession = "";
 http.createServer(function (req, res) {
     console.log('Time:', Date.now()+" "+`${req.method} ${req.url}`);
     // parse URL
@@ -126,56 +142,179 @@ http.createServer(function (req, res) {
             });
 
             // return -1;
-        }
+        } else if(req.url === '/registerAction') {
+			let body = '';
+			req.on('data', chunk => {
+				body += chunk.toString(); // convert Buffer to string
+			});
+			req.on('end', () => {
+				var myData = new Account(parse(body));
+				res.writeHead(302, {
+				  'Location': '/login.html'
+				});
+				myData.save()
+				/* .then(item => {
+				})
+				.catch(err => {
+				}); */
+				res.end();
+				
+			});
+		} else if (req.url === '/loginAction') {
+			let body = '';
+			req.on('data', chunk => {
+				body += chunk.toString(); // convert Buffer to string
+			});
+			req.on('end', () => {
+				var jsonAccount = parse(body);
+				
+				Account.findOne({username: jsonAccount.username}, 
+							function(err, obj) {
+								var account = obj;
+								if (account){
+									if (account.passworde === jsonAccount.passworde){
+										fakeSession = jsonAccount.username;
+										res.writeHead(302, {
+										  'Location': '/'
+										});
+										res.end();
+									} else {
+										res.writeHead(302, {
+										  'Location': '/login.html'
+										});
+										res.end();
+									}
+								} else {
+									res.writeHead(302, {
+									  'Location': '/login.html'
+									});
+									res.end();
+								}
+							});
+							
+				/* var myData = new Account(parse(body));
+				res.writeHead(302, {
+				  'Location': '/login.html'
+				});
+				res.end(); */
+				
+			});
+		}
     }else{
-        var q = url.parse(req.url, true).query;
-        // var txt = q.offset + " " + q.limit;
-        // console.log(txt);
-        fs.exists(pathname, function (exist) {
-            if (!exist) {
-                // if the file is not found, return 404
-                res.statusCode = 404;
-                res.end(`File ${pathname} not found!`);
-                return;
-            }
-            // if is a directory, then look for index.html
-            if (fs.statSync(pathname).isDirectory()) {
-                pathname += '/index.html';
-            }
-
-            if (req.url === '/search') {
+		if (req.url === "/" || req.url === "/upload/index.html" || req.url === "/index.html") {
+			if (fakeSession == ""){
+				res.writeHead(302, {
+				  'Location': '/login.html'
+				});
+				res.end();
+				return;
+			}
+			var q = url.parse(req.url, true).query;
+			// var txt = q.offset + " " + q.limit;
+			// console.log(txt);
+			fs.exists(pathname, function (exist) {
+				if (!exist) {
+					// if the file is not found, return 404
+					res.statusCode = 404;
+					res.end(`File ${pathname} not found!`);
+					return;
+				}
+				// if is a directory, then look for index.html
+				if (fs.statSync(pathname).isDirectory()) {
+					pathname += '/index.html';
+				}
+				
+				if (req.url === '/search') {
                 //extract key using req.query.key
                 //call MySQL Query.
                 //form JSON response and return.
                 pathname += '/search.html';
-            }
-            if(q.offset != null) {
-                if(q.offset < imgdir.length){
-                    res.write('<section class=\'center\'>');
-                    res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[q.offset]+'</span></div>');
-                    res.write('<hr/>');
-                    res.write('<div> <img src=/imgdatabank/'+imgdir[q.offset]+' class="image"></div>');
-                    res.write('<div><p>Comments</p>');
-                    res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
-                    res.write('</section>');
-                }
-                res.end();
-                return;
-            }
-            // read file from file system
-            fs.readFile(pathname, function (err, data) {
-                if (err) {
-                    res.statusCode = 500;
-                    res.end(`Error getting the file: ${err}.`);
-                } else {
-                    // based on the URL path, extract the file extention. e.g. .js, .doc, ...
-                    const ext = path.parse(pathname).ext;
-                    // if the file is found, set Content-type and send data
-                    res.setHeader('Content-type', mimeType[ext] || 'text/plain');
-                    res.end(data);
-                }
-            });
-        });
-    };
+				}
+
+				if(q.offset != null) {
+					if(q.offset < imgdir.length){
+						res.write('<section class=\'center\'>');
+						res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[q.offset]+'</span></div>');
+						res.write('<hr/>');
+						res.write('<div> <img src=/imgdatabank/'+imgdir[q.offset]+' class="image"></div>');
+						res.write('<div><p>Comments</p>');
+						res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+						res.write('</section>');
+					}
+					res.end();
+					return;
+				}
+				// read file from file system
+				fs.readFile(pathname, function (err, data) {
+					if (err) {
+						res.statusCode = 500;
+						res.end(`Error getting the file: ${err}.`);
+					} else {
+						// based on the URL path, extract the file extention. e.g. .js, .doc, ...
+						const ext = path.parse(pathname).ext;
+						// if the file is found, set Content-type and send data
+						res.setHeader('Content-type', mimeType[ext] || 'text/plain');
+						res.end(data);
+					}
+				});
+			});
+		} else if (req.url === "/logout"){
+			fakeSession = "";
+			res.writeHead(302, {
+				'Location': '/login.html'
+				});
+			res.end();
+		} else {
+			var q = url.parse(req.url, true).query;
+			// var txt = q.offset + " " + q.limit;
+			// console.log(txt);
+			fs.exists(pathname, function (exist) {
+				if (!exist) {
+					// if the file is not found, return 404
+					res.statusCode = 404;
+					res.end(`File ${pathname} not found!`);
+					return;
+				}
+				// if is a directory, then look for index.html
+				if (fs.statSync(pathname).isDirectory()) {
+					pathname += '/index.html';
+				}
+				
+				if (req.url === '/search') {
+                //extract key using req.query.key
+                //call MySQL Query.
+                //form JSON response and return.
+                pathname += '/search.html';
+				}
+
+				if(q.offset != null) {
+					if(q.offset < imgdir.length){
+						res.write('<section class=\'center\'>');
+						res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[q.offset]+'</span></div>');
+						res.write('<hr/>');
+						res.write('<div> <img src=/imgdatabank/'+imgdir[q.offset]+' class="image"></div>');
+						res.write('<div><p>Comments</p>');
+						res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+						res.write('</section>');
+					}
+					res.end();
+					return;
+				}
+				// read file from file system
+				fs.readFile(pathname, function (err, data) {
+					if (err) {
+						res.statusCode = 500;
+						res.end(`Error getting the file: ${err}.`);
+					} else {
+						// based on the URL path, extract the file extention. e.g. .js, .doc, ...
+						const ext = path.parse(pathname).ext;
+						// if the file is found, set Content-type and send data
+						res.setHeader('Content-type', mimeType[ext] || 'text/plain');
+						res.end(data);
+					}
+				});
+			});
+		};
+	}
 }).listen(parseInt(port));
 console.log(`Server listening on port ${port}`);
