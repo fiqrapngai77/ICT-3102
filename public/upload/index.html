@@ -118,9 +118,7 @@
       accept: function(file, done) {
         file.acceptDimensions = done;
       }
-  };
-	
-	dropzoneTest.on('sending', function(file, xhr, formData){
+	  sending: function(file, xhr, formData){
 			if(document.forms["dropzoneTest"]["tag1"].value != "" || document.forms["dropzoneTest"]["tag1"].value != null) {
 				alert(document.forms["dropzoneTest"]["tag1"].value);
 				//formData.append('tag1', document.forms["dropzoneTest"]["tag1"].value);
@@ -133,9 +131,9 @@
 				alert(document.forms["dropzoneTest"]["tag3"].value);
 				//formData.append('tag3', document.forms["dropzoneTest"]["tag3"].value);
 			}
-			
 				alert("upload?");
-        });
+    }
+  };
 	</script>
     <script>$(document).ready(function() { $('body').bootstrapMaterialDesign(); });</script>
 	
