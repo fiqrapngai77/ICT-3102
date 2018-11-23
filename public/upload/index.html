@@ -120,13 +120,13 @@
       },
 	  sending: function(file, xhr, formData){
 			if(!document.forms["dropzoneTest"]["tag1"].value != "") {
-				formData.append('tag1', document.forms["dropzoneTest"]["tag1"].value);
+				formData.append('tag[1]', document.forms["dropzoneTest"]["tag1"].value);
 			}
 			if(document.forms["dropzoneTest"]["tag2"].value != "") {
-				formData.append('tag2', document.forms["dropzoneTest"]["tag2"].value);
+				formData.append('tag[2]', document.forms["dropzoneTest"]["tag2"].value);
 			}
 			if(document.forms["dropzoneTest"]["tag3"].value != "") {
-				formData.append('tag3', document.forms["dropzoneTest"]["tag3"].value);
+				formData.append('tag[3]', document.forms["dropzoneTest"]["tag3"].value);
 			}
     }
   };
