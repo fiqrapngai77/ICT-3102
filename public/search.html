@@ -23,7 +23,7 @@
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item active">
+                <li class="nav-item">
                     <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
@@ -32,6 +32,9 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="search.html">Search</a>
                 </li>
+				<li class="nav-item">
+				  <a class="nav-link" href="/logout">Logout</a>
+				</li>
             </ul>
             <form class="form-inline my-2 my-lg-0" id="searchForm" action="/search.html">
                 <input class="form-control mr-sm-2" type="text" name="s" placeholder="Search..."/>
@@ -43,6 +46,7 @@
 
 </head>
 <body style="padding-top">
+<section id="content"></section>
 
 
 <!-- TEST -->
@@ -58,7 +62,7 @@
 
 
 <script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
-<script type="text/javascript" src="./js/typeahead.jquery.js"></script>
+<!--<script type="text/javascript" src="./js/typeahead.jquery.js"></script>-->
 
 <script>
     /* attach a submit handler to the form */
@@ -66,7 +70,11 @@
 
         /* stop form from submitting normally */
         event.preventDefault();
-
+        let content = $("body").find('#content');
+        // console.log(content);
+        // if(content.) {
+        //     content.remove();
+        // }
         /* get some values from elements on the page: */
         var $form = $(this),
             term = $form.find('input[name="s"]').val(),
@@ -79,8 +87,8 @@
 
         /* Put the results in a div */
         posting.done(function(data) {
-            // var content = $().find('#content');
-            $("body").append(data);
+            let content2 = $("body").find('#content');
+            content2.append(data);
         });
     });
 </script>

@@ -29,8 +29,11 @@
         <li class="nav-item">
           <a class="nav-link" href="upload/index.html">Upload</a>
         </li>
-        <li class="nav-item active">
+        <li class="nav-item">
           <a class="nav-link" href="search.html">Search</a>
+        </li>
+		<li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
         </li>
       </ul>
     </div>
@@ -52,28 +55,35 @@
 
 
 <script type="text/javascript" src="./js/jquery-3.3.1.min.js"></script>
-<script type="text/javascript" src="./js/typeahead.jquery.js"></script>
+<!--<script type="text/javascript" src="./js/typeahead.jquery.js"></script>-->
 
 <script type="text/javascript">
     var flag = 0;
     var limit = 1;
     var timer;
+    let maxLimit = 10;
     var windowHeight = $(window).height();
-    var triggerHeight = 0.5 * windowHeight;
+    var triggerHeight = 0.2 * windowHeight;
 
     $(document).ready(function(){
-        $.ajax({
-            type: 'GET',
-            url: 'http://127.0.0.1:8081/loadmore.html',
-            data:{
-                'offset': 0,
-                'limit': limit
-            },
-            success: function(data){
-                $('body').append(data);
-                flag += limit;
-            }
-        });
+        if(flag < maxLimit) {
+            $.ajax({
+                type: 'GET',
+                url: 'http://127.0.0.1:8081/loadmore.html',
+                data: {
+                    'offset': 0,
+                    'limit': limit
+                },
+                success: function (data, textStatus, XMLHttpRequest) {
+                    $('body').append(data);
+                    maxLimit = parseInt(XMLHttpRequest.getResponseHeader('maxlength'));
+                    console.log(maxLimit);
+                    if (flag < maxLimit) {
+                        flag += limit;
+                    }
+                }
+            });
+        }
     });
 
     $(window).scroll(function(){
@@ -85,18 +95,24 @@
             var y = $(window).scrollTop() + windowHeight;
 
             if(y > triggerHeight) {
-                $.ajax({
-                    type: "GET",
-                    url: "http://127.0.0.1:8081/loadmore.html",
-                    data:{
-                        'offset': flag,
-                        'limit': limit
-                    },
-                    success: function(data){
-                        $('body').append(data);
-                        flag += limit;
-                    }
-                });
+                if (flag < maxLimit) {
+                    $.ajax({
+                        type: "GET",
+                        url: "http://127.0.0.1:8081/loadmore.html",
+                        data: {
+                            'offset': flag,
+                            'limit': limit
+                        },
+                        success: function (data, textStatus, XMLHttpRequest) {
+                            $('body').append(data);
+                            maxLimit = parseInt(XMLHttpRequest.getResponseHeader('maxlength'));
+                            console.log(maxLimit);
+                            if (flag < maxLimit) {
+                                flag += limit;
+                            }
+                        }
+                    });
+                }
             }
         }, 20);
     });
