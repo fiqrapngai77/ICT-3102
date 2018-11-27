@@ -23,6 +23,16 @@ var accountSchema = new mongoose.Schema({
 });
 var Account = mongoose.model("Account", accountSchema);
 
+//mongoose schema for images
+var imagesSchema = new mongoose.Schema({
+	filename: String,
+	uploader: String,
+	hashtags: String,
+	comments: String,
+	fileDir: String
+});
+var Images = mongoose.model("Images", imagesSchema);
+
 app.use(express.static('public'));
 app.use('/upload', express.static('public'));
 // app.use(morgan('common'));
@@ -35,8 +45,16 @@ var Storage = multer.diskStorage({
     filename: function (req, file, callback) {
         // console.log(file);
         file.originalname = file.originalname.replace(/\s/g, '');
-        imgdir.push(Date.now()+file.originalname);
-        callback(null, Date.now()+file.originalname );
+        var newFileName = Date.now()+file.originalname
+        imgdir.push(newFileName);
+        callback(null, newFileName);
+
+        let hashtags = req.body.tag1+","+req.body.tag2+","+req.body.tag3;
+        var body = '';
+        body += "filename="+newFileName+"&uploader=syafiq&hashtags="+hashtags+"&comments=lulz&fileDir="+__dirname+"/public/imgdatabank/"+newFileName;
+
+        var jsonImage = new Images(parse(body));
+        jsonImage.save();
         // callback(null, file.fieldname + '-' + Date.now());
     }
 });
@@ -96,12 +114,15 @@ http.createServer(function (req, res) {
     if(req.method === 'POST'){
         if (req.url === '/upload') {
             // let form = new formidable.IncomingForm();
-            upload(req, res, function (err) {
+        	upload(req, res, function (err) {
                 if (err) {
                     console.log("Something went wrong!");
                     console.log(err);
                     res.end("Something went wrong!");
-                }
+                }   
+
+
+
                 console.log("The file was saved!");
                 res.end("File uploaded sucessfully!.");
             });
@@ -146,6 +167,7 @@ http.createServer(function (req, res) {
 			let body = '';
 			req.on('data', chunk => {
 				body += chunk.toString(); // convert Buffer to string
+				console.log(body);
 			});
 			req.on('end', () => {
 				var myData = new Account(parse(body));
@@ -231,6 +253,24 @@ http.createServer(function (req, res) {
                 pathname += '/search.html';
 				}
 
+				// Images.find().stream().on('data',function(doc){
+				// 	res.write('<section class=\'center\'>');
+				// 	res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+doc.filename+'</span></div>');
+				// 	res.write('<hr/>');
+				// 	res.write('<div> <img src='+doc.fileDir+' class="image"></div>');
+				// 	res.write('<div><p>Comments</p>');
+				// 	res.write(doc.comments);
+				// 	res.write('</section>');
+				// }).on('error',function(err){
+				// 	console.log("Error");
+				// }).on('end',function(){
+				// 	res.end();
+				// 	return;
+				// });	
+
+				
+
+
 				if(q.offset != null) {
 					if(q.offset < imgdir.length){
 						res.write('<section class=\'center\'>');
@@ -300,6 +340,10 @@ http.createServer(function (req, res) {
 					res.end();
 					return;
 				}
+
+
+
+
 				// read file from file system
 				fs.readFile(pathname, function (err, data) {
 					if (err) {
