@@ -69,7 +69,7 @@
         if(flag < maxLimit) {
             $.ajax({
                 type: 'GET',
-                url: 'http://127.0.0.1:8081/loadmore.html',
+                url: '/loadmore.html',
                 data: {
                     'offset': 0,
                     'limit': limit
@@ -98,7 +98,7 @@
                 if (flag < maxLimit) {
                     $.ajax({
                         type: "GET",
-                        url: "http://127.0.0.1:8081/loadmore.html",
+                        url: "/loadmore.html",
                         data: {
                             'offset': flag,
                             'limit': limit
