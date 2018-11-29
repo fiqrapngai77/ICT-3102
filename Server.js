@@ -271,19 +271,43 @@ http.createServer(function (req, res) {
 				
 
 
-				if(q.offset != null) {
-					if(q.offset < imgdir.length){
-						res.write('<section class=\'center\'>');
-						res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[q.offset]+'</span></div>');
-						res.write('<hr/>');
-						res.write('<div> <img src=/imgdatabank/'+imgdir[q.offset]+' class="image"></div>');
-						res.write('<div><p>Comments</p>');
-						res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
-						res.write('</section>');
-					}
-					res.end();
+				// if(q.offset != null) {
+				// 	if(q.offset < imgdir.length){
+				// 		res.write('<section class=\'center\'>');
+				// 		res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[q.offset]+'</span></div>');
+				// 		res.write('<hr/>');
+				// 		res.write('<div> <img src=/imgdatabank/'+imgdir[q.offset]+' class="image"></div>');
+				// 		res.write('<div><p>Comments</p>');
+				// 		res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+				// 		res.write('</section>');
+				// 	}
+				// 	res.end();
+				// 	return;
+				// }
+
+				if(q.offset != null){
+					retrieveImages(q.offset,function(err,image){
+						// for(var x = q.offset; x < image.length; x++){
+							res.write('<section class=\'center\'>');
+							res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+image[0].filename+'</span></div>');
+							res.write('<hr/>');
+							res.write('<div> <img src=/imgdatabank/'+image[0].filename+' class="image"></div>');
+							var postHastag = image[0].hashtags.split(',');
+							res.write("<p>");
+							for(var hashIdx = 0; hashIdx < postHastag.length; hashIdx++){
+								res.write("<a href='#'>#"+postHastag[hashIdx]+" </a>");
+							}
+							res.write("</p>");
+							res.write('<div><p>Comments</p>');
+							res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+							res.write('</section>');		
+											
+						// }
+						res.end();
+					});
 					return;
 				}
+
 				// read file from file system
 				fs.readFile(pathname, function (err, data) {
 					if (err) {
@@ -327,22 +351,64 @@ http.createServer(function (req, res) {
                 pathname += '/search.html';
 				}
 
-				if(q.offset != null) {
-					if(q.offset < imgdir.length){
-						res.write('<section class=\'center\'>');
-						res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[q.offset]+'</span></div>');
-						res.write('<hr/>');
-						res.write('<div> <img src=/imgdatabank/'+imgdir[q.offset]+' class="image"></div>');
-						res.write('<div><p>Comments</p>');
-						res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
-						res.write('</section>');
-					}
-					res.end();
+				// if(q.offset != null) {
+				// 	if(q.offset < imgdir.length){
+				// 		res.write('<section class=\'center\'>');
+				// 		res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+imgdir[q.offset]+'</span></div>');
+				// 		res.write('<hr/>');
+				// 		res.write('<div> <img src=/imgdatabank/'+imgdir[q.offset]+' class="image"></div>');
+				// 		res.write('<div><p>Comments</p>');
+				// 		res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+				// 		res.write('</section>');
+				// 	}
+				// 	res.end();
+				// 	return;
+
+				// }	
+
+				// var body = "";
+				// if(q.offset != null){
+				// 	if(q.offset < imgdir.length){
+				// 		Images.find({},function(err,obj){
+				// 			obj.forEach(function(image){		
+				// 				body += '<section class=\'center\'>';
+				// 				body += '<hr/>';
+				// 				body += '<div> <img src=/imgdatabank/'+image.filename+' class="image"></div>';
+				// 				body += '</section>';
+				// 			});
+				// 		res.write(body);	
+				// 		res.end();
+				// 		return;
+
+				// 		});
+				// 	}
+				// }
+
+				if(q.offset != null){
+					retrieveImages(q.offset,function(err,image){
+						// for(var x = q.offset; x < image.length; x++){
+							
+							res.write('<section class=\'center\'>');
+							res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+image[0].filename+'</span></div>');
+							res.write('<hr/>');
+							res.write('<div> <img src=/imgdatabank/'+image[0].filename+' class="image"></div>');
+							var postHastag = image[0].hashtags.split(',');
+							res.write("<p>");
+							for(var hashIdx = 0; hashIdx < postHastag.length; hashIdx++){
+								res.write("<a href='#'>#"+postHastag[hashIdx]+" </a>");
+							}
+							res.write("</p>");
+							res.write('<div><p>Comments</p>');
+							res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+							res.write('</section>');	
+							
+											
+						// }
+						res.end();
+					});
 					return;
 				}
-
-
-
+				
 
 				// read file from file system
 				fs.readFile(pathname, function (err, data) {
@@ -353,7 +419,7 @@ http.createServer(function (req, res) {
 						// based on the URL path, extract the file extention. e.g. .js, .doc, ...
 						const ext = path.parse(pathname).ext;
 						// if the file is found, set Content-type and send data
-						res.setHeader('Content-type', mimeType[ext] || 'text/plain');
+						//res.setHeader('Content-type', mimeType[ext] || 'text/plain');
 						res.end(data);
 					}
 				});
@@ -361,4 +427,38 @@ http.createServer(function (req, res) {
 		};
 	}
 }).listen(parseInt(port));
+
+var counter = 1;
+
+function retrieveImages(offset,callback){
+	Images.find({},function(err,image){
+		var imageArray = []
+		if(err){
+			console.log("Retrieve Images Error");
+			callback(err, null);
+		}else{
+			if(typeof image[counter] != "undefined"){
+				return;
+			}
+
+			for(var i = 0; i < image.length ; i++){
+				imageArray.push(image[i]);
+			}
+	
+			counter++;
+
+			try{
+				callback(null, imageArray)
+			}catch(err){
+				console.log("No more images to load!");
+				counter =1;
+			}
+			
+			
+			// callback(null,image);
+			
+		}
+	}).skip(counter).limit(1);
+}
+
 console.log(`Server listening on port ${port}`);
