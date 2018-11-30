@@ -53,6 +53,34 @@
         <div class="fallback"> <!-- This div will be removed if the fallback is not necessary -->
           <input type="file" name="youfilename" />
         </div>
+		
+		<div class="row">
+		<div class='col'>
+			<div class="form-group">
+				<label for="tag1" class="bmd-label-floating">Tag 1</label>
+				<input type="text" name = "tag1" id = "tag1" class= "form-control">
+				<span class="bmd-help">Enter tag(s), you can leave them blank.</span>
+            </div>
+		</div>
+		
+		<div class='col'>
+            <div class="form-group">
+				<label for="tag2" class="bmd-label-floating">Tag 2</label>
+				<input type="text" name = "tag2" id = "tag2" class= "form-control">
+				<span class="bmd-help">Enter tag(s), you can leave them blank.</span>
+            </div>
+		</div>
+		
+		<div class='col'>
+            <div class="form-group">
+				<label for="tag3" class="bmd-label-floating">Tag 3</label>
+				<input type="text" name = "tag3" id = "tag3" class= "form-control">
+				<span class="bmd-help">Enter tag(s), you can leave them blank.</span>
+            </div>
+		</div>
+		
+		</div>
+		
       </form>
 
     </div>
@@ -89,7 +117,18 @@
       },
       accept: function(file, done) {
         file.acceptDimensions = done;
-      }
+      },
+	  sending: function(file, xhr, formData){
+			if(!document.forms["dropzoneTest"]["tag1"].value != "") {
+				formData.append('tag[1]', document.forms["dropzoneTest"]["tag1"].value);
+			}
+			if(document.forms["dropzoneTest"]["tag2"].value != "") {
+				formData.append('tag[2]', document.forms["dropzoneTest"]["tag2"].value);
+			}
+			if(document.forms["dropzoneTest"]["tag3"].value != "") {
+				formData.append('tag[3]', document.forms["dropzoneTest"]["tag3"].value);
+			}
+    }
   };
 	</script>
     <script>$(document).ready(function() { $('body').bootstrapMaterialDesign(); });</script>
