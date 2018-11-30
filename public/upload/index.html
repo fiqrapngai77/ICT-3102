@@ -114,12 +114,28 @@
         this.on('thumbnail', function(file) {
             file.acceptDimensions();
         });
+		var totalFiles = 0,
+            completeFiles = 0;
+        this.on("addedfile", function (file) {
+            totalFiles += 1;
+        });
+        this.on("removed file", function (file) {
+            totalFiles -= 1;
+        });
+        this.on("complete", function (file) {
+            completeFiles += 1;
+            if (completeFiles === totalFiles) {
+				document.forms["dropzoneTest"]["tag1"].value = "";
+				document.forms["dropzoneTest"]["tag2"].value = "";
+				document.forms["dropzoneTest"]["tag3"].value = "";
+            }
+        });
       },
       accept: function(file, done) {
         file.acceptDimensions = done;
       },
 	  sending: function(file, xhr, formData){
-			if(!document.forms["dropzoneTest"]["tag1"].value != "") {
+			if(document.forms["dropzoneTest"]["tag1"].value != "") {
 				formData.append('tag[1]', document.forms["dropzoneTest"]["tag1"].value);
 			}
 			if(document.forms["dropzoneTest"]["tag2"].value != "") {

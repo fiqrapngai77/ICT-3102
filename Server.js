@@ -1,4 +1,5 @@
 var http = require('http');
+var url = require('url');
 var fs = require('fs');
 var url = require('url');
 var morgan = require('morgan');
@@ -32,6 +33,10 @@ var imagesSchema = new mongoose.Schema({
 	fileDir: String
 });
 var Images = mongoose.model("Images", imagesSchema);
+
+//Counters for dem image retrievz
+var counter = 0;
+var counter2 = 0;
 
 app.use(express.static('public'));
 app.use('/upload', express.static('public'));
@@ -224,6 +229,9 @@ http.createServer(function (req, res) {
 		}
     }else{
 		if (req.url === "/" || req.url === "/upload/index.html" || req.url === "/index.html") {
+			counter = 0;
+			counter2 = 0;
+			
 			if (fakeSession == ""){
 				res.writeHead(302, {
 				  'Location': '/login.html'
@@ -287,7 +295,7 @@ http.createServer(function (req, res) {
 
 				if(q.offset != null){
 					retrieveImages(q.offset,function(err,image){
-						// for(var x = q.offset; x < image.length; x++){
+						//for(var x = q.offset; x < q.offset + 8; x++){
 							res.write('<section class=\'center\'>');
 							res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+image[0].filename+'</span></div>');
 							res.write('<hr/>');
@@ -295,14 +303,16 @@ http.createServer(function (req, res) {
 							var postHastag = image[0].hashtags.split(',');
 							res.write("<p>");
 							for(var hashIdx = 0; hashIdx < postHastag.length; hashIdx++){
-								res.write("<a href='#'>#"+postHastag[hashIdx]+" </a>");
+								if (postHastag[hashIdx] != ""){
+									res.write("<a href='/tagas.html?tagas=" +postHastag[hashIdx]+"'>#"+postHastag[hashIdx]+" </a>");
+								}
 							}
 							res.write("</p>");
-							res.write('<div><p>Comments</p>');
-							res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+							//res.write('<div><p>Comments</p>');
+							//res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
 							res.write('</section>');		
 											
-						// }
+						//}
 						res.end();
 					});
 					return;
@@ -328,10 +338,8 @@ http.createServer(function (req, res) {
 				'Location': '/login.html'
 				});
 			res.end();
-		} else {
+		} else if (req.url.substr(0,11) === "/tagas.html"){
 			var q = url.parse(req.url, true).query;
-			// var txt = q.offset + " " + q.limit;
-			// console.log(txt);
 			fs.exists(pathname, function (exist) {
 				if (!exist) {
 					// if the file is not found, return 404
@@ -345,10 +353,76 @@ http.createServer(function (req, res) {
 				}
 				
 				if (req.url === '/search') {
-                //extract key using req.query.key
-                //call MySQL Query.
-                //form JSON response and return.
-                pathname += '/search.html';
+				//extract key using req.query.key
+				//call MySQL Query.
+				//form JSON response and return.
+				pathname += '/search.html';
+				}
+				console.log(q.offset);
+				if (q.offset != null){
+					retrieveTagas(q.offset, q.tagas,function(err,image2){
+						//for(var x = q.offset; x < q.offset + image2.length; x++){							
+							res.write('<section class=\'center\'>');
+							res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+image2[0].filename+'</span></div>');
+							res.write('<hr/>');
+							res.write('<div> <img src=/imgdatabank/'+image2[0].filename+' class="image"></div>');
+							var postHastag = image2[0].hashtags.split(',');
+							res.write("<p>");
+							for(var hashIdx = 0; hashIdx < postHastag.length; hashIdx++){
+								if (postHastag[hashIdx] != ""){
+									res.write("<a href='/tagas.html?tagas=" +postHastag[hashIdx]+"'>#"+postHastag[hashIdx]+" </a>");
+								}
+							}
+							res.write("</p>");
+							//res.write('<div><p>Comments</p>');
+							//res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+							res.write('</section>');	
+							
+											
+						//}
+						res.end();
+					});
+					return;
+				}
+				
+
+				// read file from file system
+				fs.readFile(pathname, function (err, data) {
+					if (err) {
+						res.statusCode = 500;
+						res.end(`Error getting the file: ${err}.`);
+					} else {
+						// based on the URL path, extract the file extention. e.g. .js, .doc, ...
+						const ext = path.parse(pathname).ext;
+						// if the file is found, set Content-type and send data
+						//res.setHeader('Content-type', mimeType[ext] || 'text/plain');
+						res.end(data);
+					}
+				});
+			});
+			
+		} else if (req.url.substr(0, 14) === "/loadmore.html"){
+			var q = url.parse(req.url, true).query;
+			// var txt = q.offset + " " + q.limit;
+			// console.log(txt);
+			console.log(q);
+			fs.exists(pathname, function (exist) {
+				if (!exist) {
+					// if the file is not found, return 404
+					res.statusCode = 404;
+					res.end(`File ${pathname} not found!`);
+					return;
+				}
+				// if is a directory, then look for index.html
+				if (fs.statSync(pathname).isDirectory()) {
+					pathname += '/index.html';
+				}
+				
+				if (req.url === '/search') {
+				//extract key using req.query.key
+				//call MySQL Query.
+				//form JSON response and return.
+				pathname += '/search.html';
 				}
 
 				// if(q.offset != null) {
@@ -386,7 +460,7 @@ http.createServer(function (req, res) {
 
 				if(q.offset != null){
 					retrieveImages(q.offset,function(err,image){
-						// for(var x = q.offset; x < image.length; x++){
+						//for(var x = q.offset; x < q.offset + 8; x++){
 							
 							res.write('<section class=\'center\'>');
 							res.write('<div class=\'username\'><img src=\'/imgdatabank/profile/profile.jpg\' class=\'profile\' ><span class=\'name\'>'+image[0].filename+'</span></div>');
@@ -395,15 +469,17 @@ http.createServer(function (req, res) {
 							var postHastag = image[0].hashtags.split(',');
 							res.write("<p>");
 							for(var hashIdx = 0; hashIdx < postHastag.length; hashIdx++){
-								res.write("<a href='#'>#"+postHastag[hashIdx]+" </a>");
+								if (postHastag[hashIdx] != ""){
+									res.write("<a href='/tagas.html?tagas=" +postHastag[hashIdx]+"'>#"+postHastag[hashIdx]+" </a>");
+								}
 							}
 							res.write("</p>");
-							res.write('<div><p>Comments</p>');
-							res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
+							//res.write('<div><p>Comments</p>');
+							//res.write('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\\\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,</div>');
 							res.write('</section>');	
 							
 											
-						// }
+						//}
 						res.end();
 					});
 					return;
@@ -424,11 +500,36 @@ http.createServer(function (req, res) {
 					}
 				});
 			});
+		} else {
+			var q = url.parse(req.url, true).query;
+			fs.exists(pathname, function (exist) {
+				if (!exist) {
+					// if the file is not found, return 404
+					res.statusCode = 404;
+					res.end(`File ${pathname} not found!`);
+					return;
+				}
+				// if is a directory, then look for index.html
+				if (fs.statSync(pathname).isDirectory()) {
+					pathname += '/index.html';
+				}
+				fs.readFile(pathname, function (err, data) {
+					if (err) {
+						res.statusCode = 500;
+						res.end(`Error getting the file: ${err}.`);
+					} else {
+						// based on the URL path, extract the file extention. e.g. .js, .doc, ...
+						const ext = path.parse(pathname).ext;
+						// if the file is found, set Content-type and send data
+						//res.setHeader('Content-type', mimeType[ext] || 'text/plain');
+						res.end(data);
+					}
+				});
+			});
 		};
 	}
 }).listen(parseInt(port));
 
-var counter = 1;
 
 function retrieveImages(offset,callback){
 	Images.find({},function(err,image){
@@ -437,28 +538,64 @@ function retrieveImages(offset,callback){
 			console.log("Retrieve Images Error");
 			callback(err, null);
 		}else{
-			if(typeof image[counter] != "undefined"){
-				return;
-			}
+			//if(typeof image[counter] != "undefined"){
+			//	return;
+			//}
 
 			for(var i = 0; i < image.length ; i++){
 				imageArray.push(image[i]);
+				
 			}
-	
+			
 			counter++;
 
 			try{
 				callback(null, imageArray)
 			}catch(err){
 				console.log("No more images to load!");
-				counter =1;
 			}
 			
 			
-			// callback(null,image);
+			 callback(null,image);
 			
 		}
 	}).skip(counter).limit(1);
+	//});
+}
+
+
+
+function retrieveTagas(offset,tag,callback){
+	Images.find({ "hashtags": { $regex: '.*' + tag + '.*' } },function(err,image2){
+		var imageArray2 = []
+		if(err){
+			console.log("Retrieve Images Error");
+			callback(err, null);
+		}else{
+			//if(typeof image[counter] != "undefined"){
+			//	return;
+			//}
+
+			for(var i = 0; i < image2.length ; i++){
+				imageArray2.push(image2[i]);
+				
+			}
+			
+			counter2++;
+
+			try{
+				callback(null, imageArray2)
+			}catch(err){
+				console.log("No more images to load!");
+				//counter =0;
+			}
+			
+			
+			 callback(null,image2);
+			
+		}
+	}).skip(counter2).limit(1);
+	//});
 }
 
 console.log(`Server listening on port ${port}`);
