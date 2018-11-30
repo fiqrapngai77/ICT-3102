@@ -4,7 +4,6 @@ var url = require('url');
 var morgan = require('morgan');
 var multer = require('multer');
 var express =   require("express");
-var formidable = require('formidable');
 var qs = require('querystring');
 var app = express();
 var mongoose = require("mongoose");
@@ -16,6 +15,10 @@ mongoose.connect("mongodb://localhost:27017/test",{ useNewUrlParser: true })
 	.catch(function (reason) { console.log('Unable to connect to the mongodb instance. Error: ', reason);
 });
 
+// mongoose.connect("mongodb+srv://user1:user1@cluster0-t39x7.gcp.mongodb.net/test?retryWrites=true",{ useNewUrlParser: true })
+//     .catch(function (reason) { console.log('Unable to connect to the mongodb instance. Error: ', reason);
+//     });
+
 //mongoose schtick for scheme
 var accountSchema = new mongoose.Schema({
  username: String,
@@ -23,6 +26,7 @@ var accountSchema = new mongoose.Schema({
 });
 var Account = mongoose.model("Account", accountSchema);
 
+app.use(express.compress());
 app.use(express.static('public'));
 app.use('/upload', express.static('public'));
 // app.use(morgan('common'));
@@ -35,9 +39,9 @@ var Storage = multer.diskStorage({
     filename: function (req, file, callback) {
         // console.log(req.body.tag[1]);
         // console.log(req.body.tag[2]);
-        console.log(req.body.tag1);
-        console.log(req.body.tag2);
-        console.log(req.body.tag3);
+        // console.log(req.body.tag1);
+        // console.log(req.body.tag2);
+        // console.log(req.body.tag3);
 		// for(var key in req.body){
 			// if(req.body.hasOwnProperty(key)){
 			// 	console.log([key]);
@@ -64,6 +68,7 @@ const mimeType = {
     '.css': 'text/css',
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
     '.wav': 'audio/wav',
     '.mp3': 'audio/mpeg',
     '.svg': 'image/svg+xml',
@@ -91,14 +96,14 @@ http.createServer(function (req, res) {
         // parse URL
         const parsedUrl = url.parse(req.url);
         // Website you wish to allow to connect
-        res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:8081');
+        // res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:8081');
         // Request methods you wish to allow
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
         // Request headers you wish to allow
-        res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+        // res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
         // Set to true if you need the website to include cookies in the requests sent
         // to the API (e.g. in case you use sessions)
-        res.setHeader('Access-Control-Allow-Credentials', true);
+        // res.setHeader('Access-Control-Allow-Credentials', true);
         // extract URL path
         // Avoid https://en.wikipedia.org/wiki/Directory_traversal_attack
         // e.g curl --path-as-is http://localhost:9000/../fileInDanger.txt
@@ -114,8 +119,8 @@ http.createServer(function (req, res) {
                         console.log(err);
                         res.end("Something went wrong!");
                     }
-                    console.log("The file was saved!");
-                    res.end("File uploaded sucessfully!.");
+                    console.log("A file was saved!");
+                    res.end("File uploaded successfully!.");
                 });
             }
 
@@ -280,6 +285,8 @@ http.createServer(function (req, res) {
                                 const ext = path.parse(pathname).ext;
                                 // if the file is found, set Content-type and send data
                                 res.setHeader('Content-type', mimeType[ext] || 'text/plain');
+                                res.setHeader("Cache-Control", "public, max-age=86400");
+                                res.setHeader("Expires", new Date(Date.now() + 86400000).toUTCString());
                                 res.end(data);
                             }
                         });
@@ -351,6 +358,8 @@ http.createServer(function (req, res) {
 								const ext = path.parse(pathname).ext;
 								// if the file is found, set Content-type and send data
 								res.setHeader('Content-type', mimeType[ext] || 'text/plain');
+                                res.setHeader("Cache-Control", "public, max-age=86400");
+                                res.setHeader("Expires", new Date(Date.now() + 86400000).toUTCString());
 								res.end(data);
 							}
 						});
@@ -360,4 +369,7 @@ http.createServer(function (req, res) {
     }
 });
 }).listen(parseInt(port));
-console.log(`Server listening on port ${port}`);
+console.log(`Server listening on port http://127.0.0.1:${port}`);
+var os = require( 'os' );
+var networkInterfaces = os.networkInterfaces( );
+console.log("Server facing on port http://"+ networkInterfaces['en0'][1]['address']  +`:${port}`);
